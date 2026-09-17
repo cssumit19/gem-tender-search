@@ -13,14 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install dependencies
-        run: pip install beautifulsoup4 pypdf requests
+
+      - name: Install Playwright & Dependencies
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
       - name: Run extractor
         run: python fetch_tenders.py
+
       - name: Commit and push updated JSON
         run: |
           git config --global user.name "github-actions"
