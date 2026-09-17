@@ -1,0 +1,29 @@
+name: Auto Sync GeM Tenders
+
+on:
+  schedule:
+    - cron: '0 4,14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install beautifulsoup4 pypdf requests
+      - name: Run extractor
+        run: python fetch_tenders.py
+      - name: Commit and push updated JSON
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add tenders.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update tenders" && git push)
